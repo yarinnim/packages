@@ -1,0 +1,25 @@
+{
+  "name": "@core/telegram",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build -f ./tsconfig.json",
+    "start:dev": "tsc --build -f ./tsconfig.json -w",
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:dev": "npm run test -- --watchAll",
+    "jsdoc": "tsc && jsdoc build/**/* -d jsdoc",
+    "eslint": "eslint src --ext .ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "sideEffects": false,
+  "dependencies": {
+    "telegram": "^2.26.22"
+  },
+  "peerDependencies": {
+    "@core/utils": "^1.0.0",
+    "@core/db": "^1.0.0"
+  }
+}

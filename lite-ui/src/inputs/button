@@ -1,0 +1,43 @@
+import React from 'react';
+import { Props, Justify } from '../type';
+import Icon from '../data-display/Icon';
+
+type ButtonProps = Props & React.ComponentProps<'button'> & {
+  icon?: any,
+  rightIcon?: any,
+  justify?: Justify,
+};
+
+const getProps = (props: any = {}): any => {
+  const { disabled, isAwait, className = '', ...rest} = props;
+  return {
+    ...rest,
+    disabled: isAwait || disabled || false,
+    className: `ui-button ${className}`,
+    onClick: props.onClick,
+    role: 'button',
+  };
+};
+
+
+const getChildren = (props: any) => {
+  const { children = null } = props;
+  if (!(children || false)) return null;
+  return (<div className="ui-content">{children}</div>);
+}
+
+const getIcon = (icon: any): any => {
+  return Array.isArray(icon) ? icon : [icon, {}];
+}
+
+export default function Button(props: ButtonProps) {
+  const { isAwait = false } = props;
+  const { icon = null, rightIcon = null } = props;
+  const buttonProps = getProps(props);
+  const [iconComp, iconProps] = getIcon(icon);
+  return (<button {...buttonProps}>
+    <Icon isAwait={isAwait} {...iconProps}>{iconComp}</Icon>
+    {getChildren(props)}
+    {isAwait || (<Icon>{rightIcon}</Icon>)}
+  </button>);
+}

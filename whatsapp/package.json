@@ -1,0 +1,31 @@
+{
+  "name": "@core/whatsapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build -f ./tsconfig.json",
+    "start:dev": "tsc --build -f ./tsconfig.json -w",
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:dev": "npm run test -- --watchAll",
+    "jsdoc": "tsc && jsdoc build/**/* -d jsdoc",
+    "eslint": "eslint src --ext .ts"
+  },
+  "bin": {
+    "whatsapp-patch": "./bin/patch.sh",
+    "whatsapp-patch-docker": "./bin/docker-patch.sh"
+  },
+  "dependencies": {
+    "whatsapp-web.js": "^1.34.6",
+    "qrcode-terminal": "^0.12.0"
+  },
+  "peerDependencies": {
+    "@core/utils": "^1.0.0"
+  },
+
+  "devDependencies": {
+    "@types/qrcode-terminal": "0.12.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

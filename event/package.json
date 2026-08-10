@@ -1,0 +1,18 @@
+{
+  "name": "@core/event",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build -f ./tsconfig.json",
+    "start:dev": "tsc --build -f ./tsconfig.json -w",
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:dev": "npm run test -- --watchAll",
+    "jsdoc": "tsc && jsdoc build/**/* -d jsdoc",
+    "eslint": "eslint src --ext .ts"
+  },
+  "private": true,
+  "sideEffects": false,
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

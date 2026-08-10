@@ -1,0 +1,22 @@
+{
+  "name": "@core/tailwindcss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:dev": "npm run test -- --watchAll",
+    "jsdoc": "tsc && jsdoc build/**/* -d jsdoc",
+    "eslint": "eslint src --ext .ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "sideEffects": false,
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "postcss": "^8.5.6",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^4.1.10"
+  }
+}

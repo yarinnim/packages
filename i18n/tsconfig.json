@@ -1,0 +1,17 @@
+{
+  "extends": "../../bin/config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./build",
+    "resolveJsonModule": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./build"],
+  "files": [
+    "./src/resources/cities-to-countries.json",
+    "./src/resources/countries.json",
+    "./src/resources/country-codes-to-names.json",
+    "./src/resources/country-names-to-codes.json",
+    "./src/resources/regions-to-countries.json"
+  ]
+}

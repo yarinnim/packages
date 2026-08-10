@@ -1,0 +1,31 @@
+{
+  "name": "@core/lite-ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "tsc --build -f ./tsconfig.json -w",
+    "build": "webpack --mode production",
+    "test": "jest",
+    "test:dev": "npm run test -- --watchAll",
+    "eslint": "eslint src --ext .ts,.tsx"
+  },
+  "author": "",
+  "license": "ISC",
+
+  "devDependencies": {
+    "@babel/preset-react": "^8.0.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/react-router": "^5.1.20",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0",
+    "@core/web-config": "1.0.0"
+  }
+}
