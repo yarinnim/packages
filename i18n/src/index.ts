@@ -56,6 +56,7 @@ const setLanguageFun = (props: any, language: string) => {
       };
     })
     .then((i18n: any) => {
+      document.documentElement.lang = language;
       return setI18n(() => i18n);
     });
 };
@@ -87,6 +88,7 @@ export default function useI18n(props: I18nProps) {
 
   useEffect(() => {
     const matches = localeMatches(locale);
+    document.documentElement.lang = language;
     if (matches) {
       loadFromStorage(setI18n);
     } else {

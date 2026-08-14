@@ -1,0 +1,16 @@
+/ajax/build
+/ajax/tsconfig.tsbuildinfo
+/i18n/build
+/i18n/tsconfig.tsbuildinfo
+/lite-ui/build
+/lite-ui/tsconfig.tsbuildinfo
+/log-client/build
+/log-client/tsconfig.tsbuildinfo
+/message-queue/build
+/message-queue/tsconfig.tsbuildinfo
+/tailwindcss/build
+/tailwindcss/tsconfig.tsbuildinfo
+/utils/build
+/utils/tsconfig.tsbuildinfo
+/web-config/build
+/web-config/tsconfig.tsbuildinfo
