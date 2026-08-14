@@ -6,6 +6,11 @@ declare global {
   interface Window { translate: any }
 };
 
+const direction = {
+  RTL: 'rtl',
+  LTR: 'ltr',
+};
+
 const localeEscape = (str: string, obj: Record<string, any> = {}): string => {
   const keys = Object.keys(obj);
   return keys.reduce((carry, placeholder) => {
@@ -39,7 +44,7 @@ const keysToLowerCase = (phrase: Record<string, string>) => Object.entries(phras
     };
   }, {});
 
-const setLanguageFun = (props: any, language: string) => {
+const setLanguageFun = (props: any, language: string, dir?: Direction = direction.LTR) => {
   const { version, getUrl, fetcher, setI18n } = props;
   const theUrl = getUrl(language);
   const [url, reqProps] = Array.isArray(theUrl) ? theUrl : [theUrl, {}];
@@ -49,14 +54,16 @@ const setLanguageFun = (props: any, language: string) => {
     .catch(() => ({}))
     .then(keysToLowerCase)
     .then((phrase: any) => {
-      save({ version, language }, phrase);
+      const newLocale = { version, language, direction: dir };
+      save(newLocale, phrase);
       return {
-        locale: { version, language },
+        locale: newLocale,
         phrase,
       };
     })
     .then((i18n: any) => {
       document.documentElement.lang = language;
+      document.documentElement.dir = dir;
       return setI18n(() => i18n);
     });
 };
@@ -74,10 +81,32 @@ const getLanguage = () => {
   return language;
 };
 
-export default function useI18n(props: I18nProps) {
+const getDirection = (): Direction => {
+  const { direction = 'ltr' } = getLocale() as Locale;
+  return direction;
+};
+
+type Direction = 'ltr' | 'rtl';
+
+type Locale = {
+  language: string,
+  version: string,
+  direction?: Direction,
+};
+
+export type I18n = {
+  /* eslint-disable-next-line no-unused-vars */
+  translate: (phrase: string, params?: any) => string,
+  locale: Locale,
+  /* eslint-disable-next-line no-unused-vars */
+  setLocale: (locale: string, direction?: Direction) => void,
+};
+
+export default function useI18n(props: I18nProps): I18n {
   const { language = getLanguage(), fetcher, getUrl, version } = props;
+  const direction = getDirection();
   const [i18n, setI18n] = useState({
-    locale: { language, version },
+    locale: { language, version, direction },
     phrase: {},
   });
 
@@ -89,6 +118,7 @@ export default function useI18n(props: I18nProps) {
   useEffect(() => {
     const matches = localeMatches(locale);
     document.documentElement.lang = language;
+    document.documentElement.dir = locale.direction || 'ltr';
     if (matches) {
       loadFromStorage(setI18n);
     } else {
@@ -99,5 +129,9 @@ export default function useI18n(props: I18nProps) {
   const translator = translateFnc.bind(null, i18n.phrase);
   window.translate = translator;
 
-  return [translator, locale, setLanguage];
+  return {
+    locale,
+    translate: translator,
+    setLocale: setLanguage,
+  };
 }
