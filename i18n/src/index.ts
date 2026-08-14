@@ -9,7 +9,7 @@ declare global {
 const direction = {
   RTL: 'rtl',
   LTR: 'ltr',
-};
+} as const;
 
 const localeEscape = (str: string, obj: Record<string, any> = {}): string => {
   const keys = Object.keys(obj);
@@ -26,6 +26,8 @@ const translateFnc = (phrase: any, key: string, replace: Record<string, any> = {
   const translated = localeEscape(translation || key, replace);
   return translated;
 };
+
+type Direction = 'ltr' | 'rtl';
 
 export type I18nProps = {
   version: string,
@@ -44,7 +46,11 @@ const keysToLowerCase = (phrase: Record<string, string>) => Object.entries(phras
     };
   }, {});
 
-const setLanguageFun = (props: any, language: string, dir?: Direction = direction.LTR) => {
+const setLanguageFun = (
+  props: any,
+  language: string,
+  dir: Direction = direction.LTR,
+) => {
   const { version, getUrl, fetcher, setI18n } = props;
   const theUrl = getUrl(language);
   const [url, reqProps] = Array.isArray(theUrl) ? theUrl : [theUrl, {}];
@@ -86,8 +92,6 @@ const getDirection = (): Direction => {
   return direction;
 };
 
-type Direction = 'ltr' | 'rtl';
-
 type Locale = {
   language: string,
   version: string,
@@ -99,7 +103,7 @@ export type I18n = {
   translate: (phrase: string, params?: any) => string,
   locale: Locale,
   /* eslint-disable-next-line no-unused-vars */
-  setLocale: (locale: string, direction?: Direction) => void,
+  setLocale: (locale: string, direction?: Direction) => Promise<void>,
 };
 
 export default function useI18n(props: I18nProps): I18n {
