@@ -6,6 +6,7 @@ export { default as createUseFetch } from './use-fetch';
 export { default as createUseConfirm } from './use-modal/use-confirm';
 
 export { default as useClipboard } from './use-clipboard';
+export { default as useCountry } from './use-country';
 export { default as useFullScreen } from './use-fullscreen';
 export { default as useImage } from './use-image';
 export { default as useList } from './use-list';
