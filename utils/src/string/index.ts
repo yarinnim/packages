@@ -37,3 +37,32 @@ export const isPhoneNumber = (input: string): boolean => {
   const digits = input.trim().replace(/[\s\-().]/g, '').replace(/\D/g, '');
   return digits.length >= 10 && digits.length <= 15;
 };
+
+/**
+ * Builds an E.164 phone from national digits and an optional dial code.
+ *
+ * @example
+ * normalizePhone(dialCode: '+855', phone: '012345678');
+ *
+ */
+export const normalizePhone = (dialCode: string, phone: string): string => {
+  const phoneDigits = phone.replace(/\D/g, '');
+  const dialDigits = dialCode.replace(/\D/g, '');
+  const hasPlus = phone.trim().startsWith('+');
+  if (hasPlus) return `+${phoneDigits}`;
+  const national = phoneDigits.replace(/^0+/, '');
+  const merged = dialDigits
+    ? `${dialDigits}${national}`
+    : national;
+  return `+${merged}`;
+};
+
+/**
+ * True when the value is a plausible E.164 phone number.
+ *
+ * @example
+ * isValidE164('+85512345678');
+ */
+export const isValidE164 = (phoneE164: string): boolean => (
+  /^\+[1-9]\d{6,14}$/.test(phoneE164)
+);
