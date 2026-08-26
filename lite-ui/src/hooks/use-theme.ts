@@ -12,12 +12,7 @@ const themeMode = {
   AUTO: 'auto',
 };
 
-const preferDarkTheme = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  const theme = window.localStorage.getItem(THEME_KEY);
-  if (theme === themeMode.DARK) return true;
-  return mediaQuery.matches;
-};
+const preferDarkTheme = (): boolean => mediaQuery.matches;
 
 const getTheme = () => {
   const curTheme = window.localStorage.getItem(THEME_KEY);
@@ -25,13 +20,15 @@ const getTheme = () => {
   return themeMode.AUTO;
 };
 
+const resolvePageTheme = (theme: string): string => {
+  const isAuto = theme === themeMode.AUTO;
+  if (!isAuto) return theme;
+  return preferDarkTheme() ? themeMode.DARK : themeMode.LIGHT;
+};
+
 const applyTheme = (theme: string): void => {
   window.localStorage.setItem(THEME_KEY, theme);
-  const isAuto = theme === themeMode.AUTO;
-  const pageTheme = isAuto
-    ? (preferDarkTheme() ? themeMode.DARK :  themeMode.LIGHT)
-    : theme;
-  document.documentElement.setAttribute('data-theme', pageTheme);
+  document.documentElement.setAttribute('data-theme', resolvePageTheme(theme));
 };
 
 export default function useTheme(): Theme {
@@ -47,15 +44,17 @@ export default function useTheme(): Theme {
 
   useEffect(() => {
     applyTheme(mode);
-    const changeHandler = (evt: any) => {
+    const changeHandler = () => {
       const curMode = getTheme();
       if (curMode !== themeMode.AUTO) return;
-      const nextMode = evt.matches ? themeMode.DARK : themeMode.AUTO;
-      setThemeMode(nextMode);
+      document.documentElement.setAttribute(
+        'data-theme',
+        resolvePageTheme(themeMode.AUTO),
+      );
     };
 
     mediaQuery.addEventListener('change', changeHandler);
-    return () => mediaQuery.removeEventListener('change', changeHandler); 
+    return () => mediaQuery.removeEventListener('change', changeHandler);
   }, []);
 
   return [mode, setThemeMode];
