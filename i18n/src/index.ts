@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { localeMatches } from './utils';
 import { getPhrase, save, getLocale } from './storage';
+export { type Locale } from './type';
 
 declare global {
   interface Window { translate: any }

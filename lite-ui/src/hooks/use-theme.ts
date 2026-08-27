@@ -3,21 +3,13 @@ import { useState, useEffect } from 'react';
 const THEME_KEY = 'ui-theme';
 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-/* eslint-disable-next-line no-unused-vars */
-type Theme = [string, (mode: string) => void];
-
 const themeMode = {
   DARK: 'dark',
   LIGHT: 'light',
   AUTO: 'auto',
 };
 
-const preferDarkTheme = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  const theme = window.localStorage.getItem(THEME_KEY);
-  if (theme === themeMode.DARK) return true;
-  return mediaQuery.matches;
-};
+const preferDarkTheme = (): boolean => mediaQuery.matches;
 
 const getTheme = () => {
   const curTheme = window.localStorage.getItem(THEME_KEY);
@@ -25,38 +17,82 @@ const getTheme = () => {
   return themeMode.AUTO;
 };
 
-const applyTheme = (theme: string): void => {
-  window.localStorage.setItem(THEME_KEY, theme);
+const resolvePageTheme = (theme: string): string => {
   const isAuto = theme === themeMode.AUTO;
-  const pageTheme = isAuto
-    ? (preferDarkTheme() ? themeMode.DARK :  themeMode.LIGHT)
-    : theme;
-  document.documentElement.setAttribute('data-theme', pageTheme);
+  if (!isAuto) return theme;
+  return preferDarkTheme() ? themeMode.DARK : themeMode.LIGHT;
 };
 
-export default function useTheme(): Theme {
+const applyTheme = (theme: string): void => {
+  window.localStorage.setItem(THEME_KEY, theme);
+  document.documentElement.setAttribute('data-theme', resolvePageTheme(theme));
+};
+
+export type ThemeItem = {
+  name: string,
+  label: string,
+};
+
+export type ThemeProps = {
+  defaultMode?: string,
+  themes?: ThemeItem[],
+};
+
+export type Theme = {
+  isAwait: boolean,
+  mode: string,
+  /* eslint-disable-next-line no-unused-vars */
+  setMode: (mode: string) => void,
+};
+
+const getThemeNames = (themes: ThemeItem[] = []) => {
+  if (themes.length === 0) {
+    return [themeMode.LIGHT, themeMode.DARK, themeMode.AUTO];
+  }
+  return themes.map((item) => item.name);
+};
+
+const isValidTheme = (mode: string, themes: ThemeItem[] = []): boolean => {
+  const names = getThemeNames(themes);
+  return names.includes(mode);
+};
+
+export default function useTheme(props: ThemeProps = {}): Theme {
+  const { themes = [] } = props;
   const theme = getTheme();
-  const [mode, setMode] = useState<string>(theme);
+  const initialMode = isValidTheme(theme, themes) ? theme : themeMode.AUTO;
+  const [mode, setMode] = useState<string>(initialMode);
+  const [isAwait, setIsAwait] = useState<boolean>(false);
 
   const setThemeMode = (nMode: string) => {
+    if (isAwait) return false;
+    if (!isValidTheme(nMode, themes)) return false;
+    setIsAwait(true);
     setMode(() => {
       applyTheme(nMode);
+      setIsAwait(false);
       return nMode;
     });
   };
 
   useEffect(() => {
     applyTheme(mode);
-    const changeHandler = (evt: any) => {
+    const changeHandler = () => {
       const curMode = getTheme();
       if (curMode !== themeMode.AUTO) return;
-      const nextMode = evt.matches ? themeMode.DARK : themeMode.AUTO;
-      setThemeMode(nextMode);
+      document.documentElement.setAttribute(
+        'data-theme',
+        resolvePageTheme(themeMode.AUTO),
+      );
     };
 
     mediaQuery.addEventListener('change', changeHandler);
-    return () => mediaQuery.removeEventListener('change', changeHandler); 
+    return () => mediaQuery.removeEventListener('change', changeHandler);
   }, []);
 
-  return [mode, setThemeMode];
+  return {
+    isAwait,
+    mode,
+    setMode: setThemeMode,
+  };
 }
