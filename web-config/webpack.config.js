@@ -53,6 +53,27 @@ const getEnv = () => {
   return new webpack.DefinePlugin(env);
 };
 
+const getManifestPattern = () => ({
+  from: './manifest.json',
+  transform(content) {
+    const manifest = JSON.parse(content.toString());
+    const siteName = process.env.SITE_NAME || 'VibeTide';
+    manifest.name = siteName;
+    manifest.short_name = process.env.SITE_SHORT_NAME || siteName;
+    manifest.description = (
+      process.env.SITE_DESCRIPTION || `${siteName} streaming service`
+    );
+    return JSON.stringify(manifest, null, 2);
+  },
+});
+
+const getSiteIconPath = () => {
+  const iconPath = process.env.SITE_ICON_URL || '/icon.png';
+  if (iconPath.startsWith('http')) return iconPath;
+  if (iconPath.startsWith('/')) return `assets${iconPath}`;
+  return iconPath;
+};
+
 const devConfig = (mode) => {
   if (mode === 'production') {
     return { optimization: { minimize: true } };
@@ -120,13 +141,14 @@ module.exports = (env, { mode }, callback = {}) => {
       getEnv(),
       new CopyWebpackPlugin({
         patterns: [
-          './manifest.json',
+          getManifestPattern(),
           { from: './assets', to: 'assets' },
           ...copyPatterns,
         ],
       }),
       new HtmlWebpackPlugin({
-        title: process.env.APP_TITLE,
+        title: process.env.APP_TITLE || process.env.SITE_NAME || 'VibeTide',
+        siteIcon: getSiteIconPath(),
         ...htmlPluginOverride,
         template: './index.html',
         filename: './index.html',
