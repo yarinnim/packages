@@ -17,6 +17,7 @@ export { default as useSelect } from './use-select';
 export { default as useTheme } from './use-theme';
 export { default as useTimer } from './use-timer';
 export { default as useScrollVisibility } from './use-scroll-visibility';
+export { default as useSlidingIndicator } from './use-sliding-indicator';
 
 export const useInterval = (callback: CallableFunction, interval: number) => {
   useEffect(() => {
