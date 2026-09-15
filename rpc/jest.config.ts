@@ -1,1 +1,0 @@
-../../bin/config/jest.config.ts
