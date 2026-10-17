@@ -7,6 +7,8 @@ export type OpenModalProps = {
 
 export type ModalHook = {
   close: CallableFunction,
+  /** Closes every stacked modal layer. */
+  closeAll: CallableFunction,
   open: (props: OpenModalProps) => any,
   isOpen: CallableFunction,
   component: any,
