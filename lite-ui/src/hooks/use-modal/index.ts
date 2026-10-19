@@ -1,45 +1,61 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-// import { createElement as re } from 'react';
-import { openModal, closeModal } from './action';
+import {
+  openModal,
+  closeModal,
+  closeAllModals,
+  renderModalStack,
+  type ModalStackEntry,
+} from './action';
 import type { ModalHook } from './type';
 
 type ModalProps = {
   template?: React.FC<any>,
 };
 
-/*
-const Wrapper = (bindedProps: any, props: any) => {
-  const { component } = bindedProps;
-  const { children } = props;
-  const hasComponent = !!(component || false);
-  if (!hasComponent) return null;
-  return re('div', {}, children); 
-};
-*/
-
+/**
+ * Modal host with a stack so layered dialogs keep their own backdrops.
+ *
+ * @example
+ * const modal = useModal({ template: Modal });
+ * modal.open({ component: Confirm });
+ */
 export default function useModal(props: ModalProps = {}): ModalHook {
   const { template } = props;
-  const [component, setComponent] = useState(null);
-  const bindedProps = { template, setComponent };
+  const [stack, setStack] = useState<ModalStackEntry[]>([]);
+  const bindedProps = { template, setStack };
 
   useEffect(() => {
-    const bodyStyle = (component || false) ? 'hidden' : 'unset';
+    const bodyStyle = stack.length > 0 ? 'hidden' : 'unset';
     document.body.style.overflow = bodyStyle;
 
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [component]);
+  }, [stack.length]);
+
+  useEffect(() => {
+    if (!stack.length) return undefined;
+    const onKeyDown = (evt: KeyboardEvent) => {
+      if (evt.key !== 'Escape') return;
+      evt.stopPropagation();
+      closeModal(bindedProps);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [stack.length]);
 
   const close = closeModal.bind(null, bindedProps);
+  const closeAll = closeAllModals.bind(null, bindedProps);
   const open = openModal.bind(null, bindedProps);
 
-  return { 
+  return {
     close,
+    closeAll,
     open,
-    isOpen: () => !!(component || false),
-    component,
-   //  Wrapper: Wrapper.bind(null, bindedProps),
+    isOpen: () => stack.length > 0,
+    component: renderModalStack(stack),
   };
 }
