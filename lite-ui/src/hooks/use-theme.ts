@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 
-const THEME_KEY = 'ui-theme';
-const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
 const themeMode = {
   DARK: 'dark',
   LIGHT: 'light',
   AUTO: 'auto',
 };
 
+const THEME_KEY = 'ui-theme';
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const defaultThemes = [themeMode.LIGHT, themeMode.DARK, themeMode.AUTO];
 const preferDarkTheme = (): boolean => mediaQuery.matches;
 
-const getTheme = () => {
+const getTheme = (defaultMode: string) => {
   const curTheme = window.localStorage.getItem(THEME_KEY);
   if (curTheme) return curTheme;
-  return themeMode.AUTO;
+  return defaultMode;
 };
 
 const resolvePageTheme = (theme: string): string => {
@@ -28,14 +28,9 @@ const applyTheme = (theme: string): void => {
   document.documentElement.setAttribute('data-theme', resolvePageTheme(theme));
 };
 
-export type ThemeItem = {
-  name: string,
-  label: string,
-};
-
 export type ThemeProps = {
   defaultMode?: string,
-  themes?: ThemeItem[],
+  themes?: string[],
 };
 
 export type Theme = {
@@ -45,28 +40,24 @@ export type Theme = {
   setMode: (mode: string) => void,
 };
 
-const getThemeNames = (themes: ThemeItem[] = []) => {
-  if (themes.length === 0) {
-    return [themeMode.LIGHT, themeMode.DARK, themeMode.AUTO];
-  }
-  return themes.map((item) => item.name);
-};
-
-const isValidTheme = (mode: string, themes: ThemeItem[] = []): boolean => {
-  const names = getThemeNames(themes);
-  return names.includes(mode);
+const getThemeMode = (themes: string[], curMode: string, pMode: string = '') => {
+  if (pMode !== '') return pMode;
+  const index = themes.indexOf(curMode);
+  const isLast = index < 0 || index >= themes.length - 1;
+  const nextIndex = isLast ? 0 : index + 1;
+  return themes[nextIndex];
 };
 
 export default function useTheme(props: ThemeProps = {}): Theme {
-  const { themes = [] } = props;
-  const theme = getTheme();
-  const initialMode = isValidTheme(theme, themes) ? theme : themeMode.AUTO;
-  const [mode, setMode] = useState<string>(initialMode);
+  const { themes = defaultThemes, defaultMode = 'auto' } = props;
+  const theme = getTheme(defaultMode);
+  const [mode, setMode] = useState<string>(theme);
   const [isAwait, setIsAwait] = useState<boolean>(false);
 
-  const setThemeMode = (nMode: string) => {
+  const setThemeMode = (pMode: string = '') => {
     if (isAwait) return false;
-    if (!isValidTheme(nMode, themes)) return false;
+    const nMode = getThemeMode(themes, mode, pMode);
+
     setIsAwait(true);
     setMode(() => {
       applyTheme(nMode);
@@ -78,7 +69,7 @@ export default function useTheme(props: ThemeProps = {}): Theme {
   useEffect(() => {
     applyTheme(mode);
     const changeHandler = () => {
-      const curMode = getTheme();
+      const curMode = getTheme(defaultMode);
       if (curMode !== themeMode.AUTO) return;
       document.documentElement.setAttribute(
         'data-theme',
